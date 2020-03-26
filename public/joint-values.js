@@ -10,10 +10,10 @@ mqtt_client.on('message', (topic, message) => {
  document.body.innerHTML = JSON.stringify(joint_data);
 });
 
-let joint_datas = [];
+/*let joint_datas = [];
 mqtt_client.on('message', (topic, message) => {
     const joint_data = JSON.parse(message)
     joint_datas.push(joint_data);
     update_chart();
-   });
+   });*/
 
