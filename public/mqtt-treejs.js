@@ -114,6 +114,7 @@ load_geometries(). then(() =>{
     joints[1].geometry.translate(0,-0.282, 0);
     // J2: [312, 270, -117] Z
     joints[2].geometry.translate(-0.312,-0.670, 0.117);
+    joints[3].geometry.translate(-0.26869,-1.74413, 0.19685);
 
     scene.add(joints[0]);
     joints[0].rotation.set(THREE.Math.degToRad(90),0,0)
