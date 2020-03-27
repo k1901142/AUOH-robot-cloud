@@ -74,39 +74,78 @@ const load_geometries = async () => {
         let geometry = await load_stl('./FANUC_R2000iA165F-STL/BASE.stl');
         joints.push(new THREE.Mesh(geometry, dark));
         joints[0].geometry.scale(0.001, 0.001, 0.001);
-        scene.add(joints[0]);
+        //scene.add(joints[0]);
     } {
         let geometry = await load_stl('./FANUC_R2000iA165F-STL/J1-1.stl');
         let geometry2 = await load_stl('./FANUC_R2000iA165F-STL/J1-2.stl');
         geometry.merge(geometry2);
         joints.push(new THREE.Mesh(geometry, yellow));
         joints[1].geometry.scale(0.001, 0.001, 0.001);
-        scene.add(joints[1]);
+        //scene.add(joints[1]);
     } {
         let geometry = await load_stl('./FANUC_R2000iA165F-STL/J2.stl');
         joints.push(new THREE.Mesh(geometry, yellow));
         joints[2].geometry.scale(0.001, 0.001, 0.001);
-        scene.add(joints[2]);
+        //scene.add(joints[2]);
     } {
         let geometry = await load_stl('./FANUC_R2000iA165F-STL/J3.stl');
         joints.push(new THREE.Mesh(geometry, yellow));
         joints[3].geometry.scale(0.001, 0.001, 0.001);
-        scene.add(joints[3]);
+        //scene.add(joints[3]);
     } {
         let geometry = await load_stl('./FANUC_R2000iA165F-STL/J4.stl');
         joints.push(new THREE.Mesh(geometry, yellow));
         joints[4].geometry.scale(0.001, 0.001, 0.001);
-        scene.add(joints[4]);
+        //scene.add(joints[4]);
     } {
         let geometry = await load_stl('./FANUC_R2000iA165F-STL/J5.stl');
         joints.push(new THREE.Mesh(geometry, yellow));
         joints[5].geometry.scale(0.001, 0.001, 0.001);
-        scene.add(joints[5]);
+        //scene.add(joints[5]);
     }
 
 };
 
-load_geometries();
+let offset = [];
+
+load_geometries(). then(() =>{
+    
+    // move parts to origin
+    joints[1].geometry.translate(0,-0.282, 0);
+    // J2: [312, 270, -117] Z
+    joints[2].geometry.translate(-0.312,-0.670, 0.117);
+
+    scene.add(joints[0]);
+    joints[0].rotation.set(THREE.Math.degToRad(90),0,0)
+
+    Offsets.push(new THREE.Group());
+    offsets[0].position.set(0,0.282,0);
+
+    joints[0].add(offsets[0]);
+    offsets[0].add(joints[1]);
+
+    Offsets.push(new THREE.Group());
+    offsets[1].position.set(0.312,0.388,-0.117);
+    joints[1].add(offsets[1]);
+    offsets[1].add(joints[2]); //kiinnitetään nivel 2
+    joints[2].rotation.set(0,0,THREE.Math.degToRad(45))
+
+    //scene.add(joints[3]);
+    Offsets.push(new THREE.Group());
+    offsets[2].position.set(0.04331,1.07413,-0.07985);
+    joints[2].add(offsets[2]);
+    offsets[3].add(joints[3]); //kiinnitetään nivel 3
+    
+    joints[2].rotation.set(0,0,THREE.Math.degToRad(45))
+
+
+
+   // joints[1].add(joints[2]);
+
+
+    //joints[1].rotation.set(0, 0, THREE.Math.degToRad(45));
+}
+); // kun palaa geometriasta, niin kutsuu sisälle kirjoitettua funktiota nuoli=call back
 
 
 const orbit_controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -130,4 +169,23 @@ const resize = () => {
 window.onresize = resize;
 
 
-//Camera setup
+const mqtt_client = mqtt.connect('wss://auoh-mqtt-broker.herokuapp.com');
+
+mqtt_client.on('connect', () => {
+    mqtt_client.subscribe('joints');
+});
+
+mqtt_client.on('message', (topic, message) => {
+    if(joints.length == 6){
+
+       
+    const joint_data=JSON.parse(message);
+
+    joints[1].rotation.set(THREE.Math.degToRad(joint_data.joints[0]),0);
+    joints[2].rotation.set(0, 0, THREE.Math.degToRad(joint_data.joints[1]));
+    joints[3].rotation.set(0,0,THREE.Math.degToRad(joint_data.joints[2]));
+}
+
+});
+
+mqtt_client.on()
